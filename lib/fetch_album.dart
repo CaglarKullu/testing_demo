@@ -18,17 +18,17 @@ Future<Album> fetchAlbum(http.Client client) async {
 }
 
 class Album {
-  final int userId;
-  final int id;
-  final String title;
+  final int? userId;
+  final int? id;
+  final String? title;
 
   Album({required this.userId, required this.id, required this.title});
 
   static Album fromJson(Map<String, dynamic> jsonDecode) {
     return Album(
-      userId: jsonDecode['userId'] as int,
-      id: jsonDecode['id'] as int,
-      title: jsonDecode['title'] as String,
+      userId: jsonDecode['userId'] as int?,
+      id: jsonDecode['id'] as int?,
+      title: jsonDecode['title'] as String?,
     );
   }
 }
