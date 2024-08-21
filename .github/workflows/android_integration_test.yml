@@ -22,18 +22,29 @@ jobs:
         distribution: 'zulu'
         java-version: '11'
 
-    - name: Set up Flutter
+    - name: Set up Flutter 3.24.0
       uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.24.0'
+
+    - name: Cache Flutter dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.pub-cache
+          build
+        key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-flutter-
 
     - name: Set up Android SDK and run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 30
-        target: default
+        target: google_apis  # Use a smaller system image
         arch: x86_64
         profile: Nexus 6P
         script: |
           flutter pub get
+          sleep 10  # Reduce wait time, adjust as necessary
           flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
