@@ -12,11 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      docker:
-        options: --privileged
-        image: cirrusci/flutter:latest
-
     env:
       ADB_INSTALL_TIMEOUT: 10
       AVD_NAME: test
@@ -32,28 +27,28 @@ jobs:
         distribution: 'zulu'
         java-version: '11'
 
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.24.0'
-
-    - name: Install dependencies
-      run: flutter pub get
-
-    - name: Set up Android emulator
+    - name: Install Android SDK
       run: |
-        sudo apt-get update
-        sudo apt-get install -y lib32stdc++6 qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
-        sudo adduser $USER libvirt
-        sudo adduser $USER kvm
-        sudo apt-get install -y adb
-        sudo apt-get install -y android-tools-adb android-tools-fastboot
-        sdkmanager --install 'system-images;android-30;default;x86_64'
-        sdkmanager --install 'platforms;android-30'
-        sdkmanager --install 'platform-tools'
-        sdkmanager --install 'emulator'
-        sdkmanager --licenses
-        avdmanager create avd -n $AVD_NAME -k 'system-images;android-30;default;x86_64' --force
+        sudo apt-get update -qq
+        sudo apt-get install -y wget unzip
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip
+        mkdir -p $HOME/android-sdk/cmdline-tools
+        unzip -q commandlinetools-linux-7583922_latest.zip -d $HOME/android-sdk/cmdline-tools
+        mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+        export ANDROID_HOME=$HOME/android-sdk
+        export PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin
+        export PATH=$PATH:$HOME/android-sdk/platform-tools
+        export PATH=$PATH:$HOME/android-sdk/emulator
+        yes | sdkmanager --licenses
+        sdkmanager --update
+
+    - name: Install Android SDK Components
+      run: |
+        sdkmanager "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
+
+    - name: Create AVD
+      run: |
+        avdmanager create avd -n $AVD_NAME -k "system-images;android-30;default;x86_64" --force
         EMULATOR_NAME=$(emulator -list-avds | head -n 1)
         nohup emulator -avd $EMULATOR_NAME -no-window -no-audio -no-boot-anim -gpu off &
 
@@ -61,6 +56,14 @@ jobs:
       run: |
         adb devices
         adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'
+
+    - name: Install dependencies
+      run: flutter pub get
 
     - name: Run Integration Tests
       run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
