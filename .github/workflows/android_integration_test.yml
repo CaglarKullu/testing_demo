@@ -1,4 +1,4 @@
-name: Android Integration Test
+name: Android Integration Test on macOS 13
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
 
     steps:
     - name: Checkout repository
@@ -27,9 +27,6 @@ jobs:
       with:
         flutter-version: '3.24.0'
 
-    - name: Install dependencies
-      run: flutter pub get
-
     - name: Cache Flutter dependencies
       uses: actions/cache@v2
       with:
@@ -40,15 +37,21 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-flutter-
 
-    - name: Set up Android SDK and run tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 33
-        target: google_apis  # Use a smaller system image
-        arch: x86_64
-        profile: Nexus 6P
-        script: |
-          adb wait-for-device
-          ls -l
-          chmod u+r /home/runner/.android/emu-update-last-check.ini
-          flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+    - name: Install Android SDK
+      run: |
+        brew install --cask android-sdk
+        sdkmanager "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
+        sdkmanager --licenses
+        sdkmanager --update
+
+    - name: Create and Start AVD
+      run: |
+        avdmanager create avd -n test -k "system-images;android-30;default;x86_64" --force
+        nohup emulator -avd test -no-audio -no-window -gpu off &
+
+    - name: Wait for Android Emulator to Boot
+      run: |
+        adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+
+    - name: Run Integration Tests
+      run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
