@@ -22,7 +22,12 @@ jobs:
         distribution: 'zulu'
         java-version: '11'
 
-    - name: Set up Android SDK
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'
+
+    - name: Set up Android SDK and run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 30
