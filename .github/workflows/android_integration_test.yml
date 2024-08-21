@@ -16,11 +16,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up JDK 11
+    - name: Set up JDK 8 (Temurin)
       uses: actions/setup-java@v3
       with:
-        distribution: 'zulu'
-        java-version: '11'
+        distribution: 'temurin'
+        java-version: '8'
 
     - name: Set up Flutter 3.24.0
       uses: subosito/flutter-action@v2
@@ -40,12 +40,14 @@ jobs:
     - name: Install Android SDK
       run: |
         brew install --cask android-sdk
+        export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)  # Ensure the correct Java version is used
         sdkmanager "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
         sdkmanager --licenses
         sdkmanager --update
 
     - name: Create and Start AVD
       run: |
+        export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)  # Ensure the correct Java version is used
         avdmanager create avd -n test -k "system-images;android-30;default;x86_64" --force
         nohup emulator -avd test -no-audio -no-window -gpu off &
 
