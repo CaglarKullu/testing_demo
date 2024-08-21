@@ -43,9 +43,12 @@ jobs:
     - name: Set up Android SDK and run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 30
+        api-level: 33
         target: google_apis  # Use a smaller system image
         arch: x86_64
         profile: Nexus 6P
         script: |
+          adb wait-for-device
+          ls -l
+          chmod u+r /home/runner/.android/emu-update-last-check.ini
           flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
