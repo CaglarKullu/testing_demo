@@ -43,5 +43,4 @@ jobs:
         avd-name: test
         emulator-options: "-no-window -no-audio -no-boot-anim"
         script: | 
-          cd testing_demo
           flutter test
