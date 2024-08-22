@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  emulator-test:
+  android-test:
     runs-on: macos-13
 
     steps:
@@ -21,6 +21,17 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
+
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+
+    - name: Install Dependencies
+      run: flutter pub get
+
+    - name: Build Flutter App
+      run: flutter build apk --debug
 
     - name: Run Android Emulator and run tests
       uses: reactivecircus/android-emulator-runner@v2
@@ -34,5 +45,3 @@ jobs:
         script: | 
           ./gradlew connectedCheck
           ./gradlew app:connectedAndroidTest -Ptarget=`pwd`/integration_test/app_test.dart
-
-
