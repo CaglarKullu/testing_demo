@@ -43,5 +43,6 @@ jobs:
         avd-name: test
         emulator-options: "-no-window -no-audio -no-boot-anim"
         script: | 
+          cd testing_demo/android
           ./gradlew connectedCheck
           ./gradlew app:connectedAndroidTest -Ptarget=`pwd`/integration_test/app_test.dart
