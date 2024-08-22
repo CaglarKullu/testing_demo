@@ -1,9 +1,11 @@
-ext.kotlinVersion = '2.0.0'
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+}
+
+buildscript {
+    ext.kotlin_version = '2.0.0' // Place this inside buildscript or after the plugins block
 }
 
 android {
@@ -27,7 +29,6 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
-        // This is necessary for running instrumentation tests
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -37,7 +38,6 @@ android {
         }
     }
 
-    // Ensure that the androidTest source set is correctly set up
     sourceSets {
         androidTest {
             java.srcDirs = ['src/androidTest/java']
@@ -50,7 +50,7 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     // Add these dependencies for instrumentation testing
     testImplementation 'junit:junit:4.12'
