@@ -1,4 +1,4 @@
-name: Android Emulator Test on macOS 13
+name: Android Integration Test on macOS 13
 
 on:
   push:
@@ -32,3 +32,11 @@ jobs:
         avd-name: test
         emulator-options: "-no-window -no-audio -no-boot-anim"
         script: adb devices
+
+    - name: Wait for Emulator to Boot
+      run: |
+        adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+        adb shell getprop sys.boot_completed
+
+    - name: Run Integration Tests
+      run: ./gradlew app:connectedAndroidTest -Ptarget=`pwd`/integration_test/app_test.dart
