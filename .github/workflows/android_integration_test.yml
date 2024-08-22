@@ -47,4 +47,3 @@ jobs:
           flutter test
           flutter test integration_test/app_test.dartflutter test integration_test/app_test.dart
           flutter test integration_test/app_test.dart
-        working-directory: ./testing_demo
