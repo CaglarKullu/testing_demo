@@ -22,7 +22,7 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Run Android Emulator
+    - name: Run Android Emulator and run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 30
@@ -31,12 +31,8 @@ jobs:
         profile: Nexus 6P
         avd-name: test
         emulator-options: "-no-window -no-audio -no-boot-anim"
-        script: adb devices
+        script: | 
+          ./gradlew connectedCheck
+          ./gradlew app:connectedAndroidTest -Ptarget=`pwd`/integration_test/app_test.dart
 
-    - name: Wait for Emulator to Boot
-      run: |
-        adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-        adb shell getprop sys.boot_completed
 
-    - name: Run Integration Tests
-      run: ./gradlew app:connectedAndroidTest -Ptarget=`pwd`/integration_test/app_test.dart
