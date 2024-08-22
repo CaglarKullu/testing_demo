@@ -29,9 +29,11 @@ jobs:
 
     - name: Install Dependencies
       run: flutter pub get
+      working-directory: ./testing_demo
 
     - name: Build Flutter App
       run: flutter build apk --debug
+      working-directory: ./testing_demo
 
     - name: Run Android Emulator and run tests
       uses: reactivecircus/android-emulator-runner@v2
@@ -42,5 +44,8 @@ jobs:
         profile: Nexus 6P
         avd-name: test
         emulator-options: "-no-window -no-audio -no-boot-anim"
-        script: | 
+        script: |
           flutter test
+          flutter test integration_test/app_test.dartflutter test integration_test/app_test.dart
+          flutter test integration_test/app_test.dart
+        working-directory: ./testing_demo
