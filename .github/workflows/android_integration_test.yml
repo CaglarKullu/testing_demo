@@ -29,7 +29,7 @@ jobs:
 
     - name: Install Dependencies
       run: flutter pub get
-      working-directory: ./testing_demo
+
 
     - name: Build Flutter App
       run: flutter build apk --debug
