@@ -16,11 +16,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up JDK 8
+    - name: Set up JDK 17 (Temurin)
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: '8'
+        java-version: '17'
 
     - name: Run Android Emulator
       uses: reactivecircus/android-emulator-runner@v2
@@ -31,9 +31,4 @@ jobs:
         profile: Nexus 6P
         avd-name: test
         emulator-options: "-no-window -no-audio -no-boot-anim"
-        script: adb devices # Example script to list connected devices
-
-    - name: Wait for Emulator to Boot
-      run: |
-        adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-        adb shell getprop sys.boot_completed
+        script: adb devices
