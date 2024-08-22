@@ -37,26 +37,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-flutter-
 
-    - name: Install Android SDK
-      run: |
-        brew install --cask android-sdk
-        export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-        sdkmanager "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
-        sdkmanager --licenses
-        sdkmanager --update
-
-    - name: List Installed System Images (Debugging)
-      run: sdkmanager --list
-
-    - name: Create and Start AVD
-      run: |
-        export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-        avdmanager create avd -n test -k "system-images;android-30;default;x86_64" --force
-        nohup emulator -avd test -no-audio -no-window -gpu off &
-
-    - name: Wait for Android Emulator to Boot
-      run: |
-        adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
-
-    - name: Run Integration Tests
-      run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+    - name: Set up Android Emulator
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 30
+        target: google_apis  # Choose an image suitable for your app
+        arch: x86_64
+        profile: Nexus 6P
+        script: |
+          flutter pub get
+          flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
