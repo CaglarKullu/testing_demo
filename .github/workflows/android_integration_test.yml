@@ -33,7 +33,6 @@ jobs:
 
     - name: Build Flutter App
       run: flutter build apk --debug
-      working-directory: ./testing_demo
 
     - name: Run Android Emulator and run tests
       uses: reactivecircus/android-emulator-runner@v2
